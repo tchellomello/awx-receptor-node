@@ -1,0 +1,26 @@
+---
+- node:
+    id: {{ node.name }}
+
+- log-level: {{ node.log_level }}
+
+- control-service:
+    service: {{ node.control_service.name }}
+    filename: {{ node.control_service.filename }}
+
+- {{ node.listener_protocol|lower }}-listener
+    port: {{ node.listener_port }}
+
+{% for peer in node.peers.all %}
+- {{ peer.listener_protocol|lower}}-peer:
+    address: {{ peer.listener_address }}:{{ peer.listener_port }}
+    redial: true
+{% endfor %}
+
+{% for cmd in node.work_commands.all %}
+- work-command:
+    worktype: {{ cmd.name }}
+    command: {{ cmd.command }}
+    params: {{ cmd.params }}
+    allowruntimeparams: {{ cmd.allowruntimeparams }}
+{% endfor %}
